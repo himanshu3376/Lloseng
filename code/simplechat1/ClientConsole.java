@@ -3,8 +3,10 @@
 // license found at www.lloseng.com 
 
 import java.io.*;
+
 import client.*;
 import common.*;
+import java.util.*;
 
 /**
  * This class constructs the UI for a chat client.  It implements the
@@ -16,7 +18,7 @@ import common.*;
  * @author Dr Robert Lagani&egrave;re
  * @version July 2000
  */
-public class ClientConsole implements ChatIF 
+public class ClientConsole implements ChatIF
 {
   //Class variables *************************************************
   
@@ -41,11 +43,11 @@ public class ClientConsole implements ChatIF
    * @param host The host to connect to.
    * @param port The port to connect on.
    */
-  public ClientConsole(String host, int port) 
+  public ClientConsole(String ID, String host, int port) 
   {
     try 
     {
-      client= new ChatClient(host, port, this);
+      client= new ChatClient(ID, host, port, this);
     } 
     catch(IOException exception) 
     {
@@ -66,13 +68,13 @@ public class ClientConsole implements ChatIF
   {
     try
     {
-      BufferedReader fromConsole = 
+      BufferedReader console = 
         new BufferedReader(new InputStreamReader(System.in));
       String message;
 
       while (true) 
       {
-        message = fromConsole.readLine();
+        message = console.readLine();
         client.handleMessageFromClientUI(message);
       }
     } 
@@ -102,21 +104,88 @@ public class ClientConsole implements ChatIF
    *
    * @param args[0] The host to connect to.
    */
-  public static void main(String[] args) 
+  public static void main(String[] args)
   {
+    String userID = "";
+    System.out.print("Enter user ID: ");
+    BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+    try{
+     userID = console.readLine();
+      if (userID.isBlank()){
+        System.out.println("Error, must enter user ID. ");
+        System.exit(1);
+      }
+    } catch(IOException e){}
+
     String host = "";
-    int port = 0;  //The port number
+    int port = 0;  
 
     try
     {
       host = args[0];
-    }
-    catch(ArrayIndexOutOfBoundsException e)
+    } catch(ArrayIndexOutOfBoundsException e)
     {
       host = "localhost";
     }
-    ClientConsole chat= new ClientConsole(host, DEFAULT_PORT);
-    chat.accept();  //Wait for console data
+  
+    try{
+      port = Integer.parseInt(args[0]);
+    } catch (ArrayIndexOutOfBoundsException e){
+      port = DEFAULT_PORT;
+    }
+
+    ClientConsole chat = new ClientConsole(userID, host, port);
+    System.out.println("Connected to port: " + port);
+    chat.accept(); 
   }
-}
+    // String host = "";
+    // int port = 0;  //The port number
+
+    // try
+    // {
+    //   host = args[0];
+    // }
+    // catch(ArrayIndexOutOfBoundsException e)
+    // {
+    //   host = "localhost";
+    // }
+
+    // try {
+    //   port = Integer.parseInt(args[0]); //Get port from command line
+    //   System.out.println("You are connected to port: " + port);
+
+    // } catch (Exception e) {
+    //   port = DEFAULT_PORT; //is 5555
+    //   System.out.println("You are connected to the default port: " + port);
+    // }
+
+    // try {
+    //   port = Integer.parseInt(args[2]);
+    // } catch (Exception e) {
+    //   port = DEFAULT_PORT;
+    // }
+    // Scanner portIn = new Scanner(System.in);  
+    // System.out.println("Enter port: ");
+    // port = portIn.nextInt();  
+    // //portIn.close();
+
+    // Integer intPort = Integer.valueOf(port);
+    // // if(intPort == null ){   //Check if the port is omitted or not
+    // //   port = DEFAULT_PORT;
+    // // } else{
+    // System.out.println("You are connected to port: " + port); 
+    // // }
+    // // try
+    // // {
+    // //   port = NullPointerException;
+    // // }
+    // // catch(ArrayIndexOutOfBoundsException e)
+    // // {
+    // //   port = DEFAULT_PORT;
+    // // }
+    // ClientConsole chat= new ClientConsole(host, port);
+    // chat.accept();  //Wait for console data
+  }
+
+
 //End of ConsoleChat class
